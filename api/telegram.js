@@ -1,16 +1,15 @@
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { eventId } = req.body || {};
+  const { firebaseUrl } = req.body || {};
 
   if (
-    typeof eventId !== "string" ||
-    !/^[a-zA-Z0-9_-]{1,100}$/.test(eventId)
+    typeof firebaseUrl !== "string" ||
+    !/^https:\/\/[a-zA-Z0-9.-]+\/?$/.test(firebaseUrl.trim())
   ) {
-    return res.status(400).json({ error: "Invalid event ID" });
+    return res.status(400).json({ error: "Invalid Firebase URL" });
   }
 
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -28,7 +27,7 @@ export default async function handler(req, res) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           chat_id: chatId,
-          text: "A new configuration event was received."
+          text: `Firebase URL: ${firebaseUrl.trim()}`
         })
       }
     );
